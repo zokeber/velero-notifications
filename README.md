@@ -8,7 +8,7 @@ In order to install velero-notificacionts, first add this repository to your Hel
 helm repo add zokeber-velero-notifications https://zokeber.github.io/velero-notifications/
 ```
 
-After that, you can run `helm search repo velero-notifications` to see the charts.
+After that, you can run `helm search repo zokeber-velero-notifications` to see the charts.
 
 
 ## Install Velero Notifications
