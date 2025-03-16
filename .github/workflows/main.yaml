@@ -26,7 +26,8 @@ jobs:
   build-push-container-images:
     runs-on: ubuntu-latest
     needs: [build]
-    
+    permissions:
+      packages: write
     steps:
       - name: Login to ghcr.io registry
         uses: docker/login-action@v2
