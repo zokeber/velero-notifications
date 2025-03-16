@@ -1,0 +1,33 @@
+image:
+  repository: zokeber/velero-notifications
+  tag: "latest"
+  pullPolicy: Always
+
+namespace: "velero"
+check_interval: 300
+notification_prefix: "[kubernetes-context] "
+verbose: true
+
+slack:
+  enabled: false
+  webhook_url: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+  channel: "velero-notifications"
+  username: "Velero"
+
+email:
+  enabled: false
+  failures_only: false
+  smtp_server: "smtp.gmail.com"
+  smtp_port: 587
+  username: "username@gmail.com"
+  password: "Gmail app password"
+  from: "username@gmail.com"
+  to: "johndoe@gmail.com"
+
+## In case you need it, you can fork this repository, build the Container image, 
+## and then push it to your own Artifact Registry. Once your image is available
+## in your private registry, you’ll need to create a Kubernetes secret that stores 
+## your registry credentials. To ensure the Helm chart references this secret correctly, 
+## set the parameter imagePullSecretsName: "kubernetes-secret" in your values.yaml file.
+##
+#imagePullSecretsName: "secret"

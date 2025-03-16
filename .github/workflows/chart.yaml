@@ -1,0 +1,24 @@
+name: Publish HELM chart
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "charts/**"
+
+permissions:
+  contents: write
+
+jobs:
+  publish-helm-chart:
+    name: Publish latest chart
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Publish HELM chart
+        uses: stefanprodan/helm-gh-pages@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          charts_dir: charts

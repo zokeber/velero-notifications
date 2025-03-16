@@ -1,0 +1,51 @@
+name: build and push container image
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    outputs:
+      version: ${{ steps.semantic-version.outputs.version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Application version
+        id: semantic-version
+        uses: paulhatch/semantic-version@v5.4.0
+        with:
+          bump_each_commit: true
+  
+  build-push-container-images:
+    runs-on: ubuntu-latest
+    needs: [build]
+    
+    steps:
+      - name: Login to ghcr.io registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+  
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build and push container image
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/arm64, linux/amd64
+          push: true
+          tags: |
+            ghcr.io/${{ GITHUB.REPOSITORY }}:latest
+            ghcr.io/${{ GITHUB.REPOSITORY }}:${{needs.build.outputs.version}}

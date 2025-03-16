@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "velero-notifications.fullname" . }}-config
+  namespace: {{ .Values.namespace | default "velero" | quote }}
+data:
+  config.yaml: |-
+    logging:
+      level: {{ .Values.logging | default "info" |quote }}
+      verbose: {{ .Values.verbose | default false }}
+    namespace: {{ .Values.namespace | default "velero" | quote }}
+    check_interval: {{ .Values.check_interval | default 300 }}
+    notifications:
+      notification_prefix: {{ .Values.notification_prefix | default "k8s" | quote }}
+      slack:
+        enabled: {{ .Values.slack.enabled | default false }}
+        failures_only: {{ .Values.slack.failures_only | default false }}
+        webhook_url: {{ .Values.slack.webhook_url | quote }}
+        channel: {{ .Values.slack.channel | default "velero" | quote }}
+        username: {{ .Values.slack.username | default "velero-notifications" | quote }}
+      email:
+        enabled: {{ .Values.email.enabled | default false }}
+        failures_only: {{ .Values.email.failures_only | default false }}
+        smtp_server: {{ .Values.email.smtp_server | quote }}
+        smtp_port: {{ .Values.email.smtp_port | default 587 }}
+        username: {{ .Values.email.username | quote }}
+        password: {{ .Values.email.password | quote }}
+        from: {{ .Values.email.from | quote }}
+        to: {{ .Values.email.to | quote }}

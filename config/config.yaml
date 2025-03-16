@@ -1,0 +1,22 @@
+logging:
+  level: "debug"
+  verbose: true
+namespace: "velero"
+check_interval: 5
+notifications:
+  notification_prefix: "Kubernetes Cluster Name"
+  slack:
+    enabled: true
+    failures_only: false
+    webhook_url: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+    channel: "velero"
+    username: "Velero"
+  email:
+    enabled: false
+    failures_only: false
+    smtp_server: ""
+    smtp_port: 587
+    username: ""
+    password: ""
+    from: ""
+    to: ""

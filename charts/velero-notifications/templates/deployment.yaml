@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "velero-notifications.fullname" . }}
+  namespace: {{ .Values.namespace | default "velero" | quote }}
+  labels:
+    app: velero-notifications
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: velero-notifications
+  template:
+    metadata:
+      labels:
+        app: velero-notifications
+      annotations:
+        configHash: {{ include "velero-notifications.confighash" . | sha256sum }}
+    spec:
+      serviceAccountName: velero-notifications
+      terminationGracePeriodSeconds: 60
+      restartPolicy: Always
+      {{- if or .Values.imagePullSecretsName }}
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecretsName | quote }}
+      {{- end }}
+      initContainers:
+        - name: "fix-keepalive"
+          image: busybox:1.28
+          command:
+            - sh
+            - -c
+            - sysctl net.ipv4.tcp_keepalive_time=10 net.ipv4.tcp_keepalive_intvl=5 net.ipv4.tcp_keepalive_probes=3
+          securityContext:
+            privileged: true
+      containers:
+        - name: velero-notifications
+          image: {{ .Values.image.repository | default "zokeber/velero-notifications" }}:{{ .Values.image.tag | default "latest" }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config/config.yaml
+              subPath: config.yaml
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "velero-notifications.fullname" . }}-config
