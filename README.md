@@ -80,7 +80,7 @@ We welcome contributions from the community! Please see the [CONTRIBUTING.md](CO
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the Apache License.
 
 ## Contact
 
