@@ -1,5 +1,5 @@
 image:
-  repository: zokeber/velero-notifications
+  repository: ghcr.io/zokeber/velero-notifications
   tag: "latest"
   pullPolicy: Always
 

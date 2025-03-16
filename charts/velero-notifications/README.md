@@ -1,6 +1,6 @@
 # velero-notifications
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.13](https://img.shields.io/badge/AppVersion-0.0.13-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.3](https://img.shields.io/badge/AppVersion-0.0.3-informational?style=flat-square)
 
 A Helm chart for deploying the Velero Notifications service
 
@@ -24,15 +24,14 @@ A Helm chart for deploying the Velero Notifications service
 | email.enabled | bool | `false` |  |
 | email.failures_only | bool | `false` |  |
 | email.from | string | `"username@gmail.com"` |  |
-| email.password | string | `"app password"` |  |
+| email.password | string | `"Gmail app password"` |  |
 | email.smtp_port | int | `587` |  |
 | email.smtp_server | string | `"smtp.gmail.com"` |  |
 | email.to | string | `"johndoe@gmail.com"` |  |
 | email.username | string | `"username@gmail.com"` |  |
 | image.pullPolicy | string | `"Always"` |  |
-| image.repository | string | `"zokeber/velero-notifications"` |  |
+| image.repository | string | `"ghcr.io/zokeber/velero-notifications"` |  |
 | image.tag | string | `"latest"` |  |
-| imagePullSecretsName | string | `"secret"` |  |
 | namespace | string | `"velero"` |  |
 | notification_prefix | string | `"[kubernetes-context] "` |  |
 | slack.channel | string | `"velero-notifications"` |  |
