@@ -1,5 +1,9 @@
 # Velero Notifications
 
+[![build and push container image](https://github.com/zokeber/velero-notifications/actions/workflows/main.yaml/badge.svg)](https://github.com/zokeber/velero-notifications/actions/workflows/main.yaml)
+[![Publish HELM chart](https://github.com/zokeber/velero-notifications/actions/workflows/chart.yaml/badge.svg)](https://github.com/zokeber/velero-notifications/actions/workflows/chart.yaml)
+
+## Overview
 Velero Notifications is a Golang-based controller designed to monitor Velero backups in your Kubernetes cluster and send notifications via Slack or Email when backups complete successfully or fail. The controller uses the Kubernetes dynamic client to query backup resources, track state changes, and notify only once when a new backup is finishes.
 
 When running locally, the application uses your local kubeconfig. When deployed in-cluster, it automatically uses the in-cluster configuration.
@@ -37,14 +41,14 @@ kubectl create namespace velero
 3. **Install the chart:**
 
 ```bash
-helm install zokeber-velero-notifications velero-notifications/velero-notifications --namespace velero
+helm install velero-notifications zokeber-velero-notifications/velero-notifications --namespace velero
 ```
 4. **(Optional) Override default values:**
 
 The application is configured via a values yaml file. Create a custom values file (e.g., custom-values.yaml) with your desired settings, then run:
 
 ```bash
-helm upgrade zokeber-velero-notifications velero-notifications/velero-notifications --namespace velero -f custom-values.yaml
+helm upgrade velero-notifications zokeber-velero-notifications/velero-notifications --namespace velero -f custom-values.yaml
 ```
 
 An example configuration (in the Helm chart's ) is:
