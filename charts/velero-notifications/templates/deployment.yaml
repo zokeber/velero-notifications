@@ -35,6 +35,13 @@ spec:
             - sysctl net.ipv4.tcp_keepalive_time=10 net.ipv4.tcp_keepalive_intvl=5 net.ipv4.tcp_keepalive_probes=3
           securityContext:
             privileged: true
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "96Mi"
+            requests:
+              cpu: "50m"
+              memory: "32Mi"
       containers:
         - name: velero-notifications
           image: {{ .Values.image.repository | default "ghcr.io/zokeber/velero-notifications" }}:{{ .Values.image.tag | default .Chart.AppVersion }}
