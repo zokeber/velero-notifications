@@ -2,7 +2,7 @@ image:
   # -- The repository that contains the container image
   repository: ghcr.io/zokeber/velero-notifications
   # -- The tag for the container image, which here is set to "latest"
-  tag: "latest"
+  tag: ""
   # -- This determines the policy for pulling the image
   pullPolicy: Always
 
@@ -21,7 +21,7 @@ slack:
   # -- A boolean flag that specifies if Slack notifications should only be sent when a backup fails
   failures_only: false
   # -- The URL for the Slack webhook where notifications will be sent. This should be the URL configured in your Slack workspace for receiving messages
-  webhook_url: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+  webhook_url: "https://hooks.slack.com/services/T0/B0/XX"
   # -- The Slack channel in which notifications will be posted
   channel: "velero-notifications"
   # -- The name that will appear as the sender of the Slack notifications
@@ -62,5 +62,6 @@ resources:
 ## in your private registry, you’ll need to create a Kubernetes secret that stores 
 ## your registry credentials. To ensure the Helm chart references this secret correctly, 
 ## set the parameter imagePullSecretsName: "kubernetes-secret" in your values.yaml file.
-##
-#imagePullSecretsName: "secret"
+
+# -- Kubernetes secret that stores your registry credentials
+imagePullSecretsName: ""

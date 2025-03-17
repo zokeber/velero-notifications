@@ -37,7 +37,7 @@ spec:
             privileged: true
       containers:
         - name: velero-notifications
-          image: {{ .Values.image.repository | default "ghcr.io/zokeber/velero-notifications" }}:{{ .Values.image.tag | default "latest" }}
+          image: {{ .Values.image.repository | default "ghcr.io/zokeber/velero-notifications" }}:{{ .Values.image.tag | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
           volumeMounts:
             - name: config-volume
