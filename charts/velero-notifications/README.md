@@ -1,6 +1,6 @@
 # velero-notifications
 
-![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.9](https://img.shields.io/badge/AppVersion-0.0.9-informational?style=flat-square)
+![Version: 0.1.3](https://img.shields.io/badge/Version-0.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.9](https://img.shields.io/badge/AppVersion-0.0.9-informational?style=flat-square)
 
 A Helm chart for deploying the Velero Notifications service
 
@@ -31,7 +31,8 @@ A Helm chart for deploying the Velero Notifications service
 | email.username | string | `"username@gmail.com"` | The username for authenticating with the SMTP server |
 | image.pullPolicy | string | `"Always"` | This determines the policy for pulling the image |
 | image.repository | string | `"ghcr.io/zokeber/velero-notifications"` | The repository that contains the container image |
-| image.tag | string | `"latest"` | The tag for the container image, which here is set to "latest" |
+| image.tag | string | `""` | The tag for the container image, which here is set to "latest" |
+| imagePullSecretsName | string | `""` | Kubernetes secret that stores your registry credentials |
 | namespace | string | `"velero"` | Specifies the Kubernetes namespace where the resources will be deployed |
 | notification_prefix | string | `"[kubernetes-context] "` | A string that is prepended to all notification messages. This helps identify the context of the notifications (e.g., the Kubernetes cluster or environment) |
 | resources.limits.cpu | string | `"100m"` | This value sets the maximum CPU the container can use |
@@ -42,7 +43,7 @@ A Helm chart for deploying the Velero Notifications service
 | slack.enabled | bool | `false` | A boolean flag that turns Slack notifications on or off. |
 | slack.failures_only | bool | `false` | A boolean flag that specifies if Slack notifications should only be sent when a backup fails |
 | slack.username | string | `"Velero"` | The name that will appear as the sender of the Slack notifications |
-| slack.webhook_url | string | `"https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"` | The URL for the Slack webhook where notifications will be sent. This should be the URL configured in your Slack workspace for receiving messages |
+| slack.webhook_url | string | `"https://hooks.slack.com/services/T0/B0/XX"` | The URL for the Slack webhook where notifications will be sent. This should be the URL configured in your Slack workspace for receiving messages |
 | verbose | bool | `true` | A boolean value that enables or disables detailed logging. When set to true, the application outputs more detailed logs for debugging and monitoring purposes |
 
 ----------------------------------------------
