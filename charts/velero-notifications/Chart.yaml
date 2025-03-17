@@ -13,5 +13,5 @@ icon: https://onthedock.github.io/images/velero.jpg
 keywords:
   - velero
   - notifications
-version: 0.1.4
-appVersion: "0.0.10"
+version: 0.1.5
+appVersion: "0.0.11"
