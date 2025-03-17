@@ -1,28 +1,61 @@
 image:
+  # -- The repository that contains the container image
   repository: ghcr.io/zokeber/velero-notifications
+  # -- The tag for the container image, which here is set to "latest"
   tag: "latest"
+  # -- This determines the policy for pulling the image
   pullPolicy: Always
 
+# -- Specifies the Kubernetes namespace where the resources will be deployed
 namespace: "velero"
+# -- The interval, in seconds, that the controller will wait between each check of Velero backups
 check_interval: 300
+# -- A string that is prepended to all notification messages. This helps identify the context of the notifications (e.g., the Kubernetes cluster or environment)
 notification_prefix: "[kubernetes-context] "
+# -- A boolean value that enables or disables detailed logging. When set to true, the application outputs more detailed logs for debugging and monitoring purposes
 verbose: true
 
 slack:
+  # -- A boolean flag that turns Slack notifications on or off.
   enabled: false
+  # -- A boolean flag that specifies if Slack notifications should only be sent when a backup fails
+  failures_only: false
+  # -- The URL for the Slack webhook where notifications will be sent. This should be the URL configured in your Slack workspace for receiving messages
   webhook_url: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+  # -- The Slack channel in which notifications will be posted
   channel: "velero-notifications"
+  # -- The name that will appear as the sender of the Slack notifications
   username: "Velero"
 
 email:
+  # -- A boolean flag that indicates if email notifications are enabled
   enabled: false
+  # -- A boolean flag that specifies if email notifications should only be sent when a backup fails
   failures_only: false
+  # -- The SMTP server address used to send email notifications
   smtp_server: "smtp.gmail.com"
+  # -- The port number for the SMTP server, here set to 587 for secure connections
   smtp_port: 587
+  # -- The username for authenticating with the SMTP server
   username: "username@gmail.com"
+  # -- The password (or app-specific password) for the SMTP account
   password: "Gmail app password"
+  # -- The email address from which the notifications will be sent.
   from: "username@gmail.com"
+  # -- The recipient email address that will receive the notifications.
   to: "johndoe@gmail.com"
+
+resources:
+  limits:
+    # -- This value sets the maximum CPU the container can use
+    cpu: "100m"
+    # -- This defines the maximum memory the container is allowed to use
+    memory: "96Mi"
+  requests:
+    # -- This value specifies the minimum amount of CPU guaranteed to the container
+    cpu: "50m"
+    # -- This value specifies the minimum amount of CPU guaranteed to the container
+    memory: "64Mi" 
 
 ## In case you need it, you can fork this repository, build the Container image, 
 ## and then push it to your own Artifact Registry. Once your image is available
