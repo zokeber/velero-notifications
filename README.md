@@ -2,6 +2,9 @@
 
 [![build and push container image](https://github.com/zokeber/velero-notifications/actions/workflows/main.yaml/badge.svg)](https://github.com/zokeber/velero-notifications/actions/workflows/main.yaml)
 [![Publish HELM chart](https://github.com/zokeber/velero-notifications/actions/workflows/chart.yaml/badge.svg)](https://github.com/zokeber/velero-notifications/actions/workflows/chart.yaml)
+[![pages-build-deployment](https://github.com/zokeber/velero-notifications/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/zokeber/velero-notifications/actions/workflows/pages/pages-build-deployment)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/zokeber-velero-notifications)](https://artifacthub.io/packages/search?repo=zokeber-velero-notifications)
+
 
 ## Overview
 Velero Notifications is a Golang-based controller designed to monitor Velero backups in your Kubernetes cluster and send notifications via Slack or Email when backups complete successfully or fail. The controller uses the Kubernetes dynamic client to query backup resources, track state changes, and notify only once when a new backup is finishes.
