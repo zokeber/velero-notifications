@@ -43,6 +43,17 @@ spec:
             - name: config-volume
               mountPath: /config/config.yaml
               subPath: config.yaml
+          resources:
+            {{- with .Values.resources }}
+            {{- toYaml . | nindent 12 }}
+            {{- else }}
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+            requests:
+              cpu: "100m"
+              memory: "32Mi"
+            {{- end }}
       volumes:
         - name: config-volume
           configMap:
