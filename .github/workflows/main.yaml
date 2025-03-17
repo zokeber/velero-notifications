@@ -20,8 +20,6 @@ jobs:
       - name: Application version
         id: semantic-version
         uses: paulhatch/semantic-version@v5.4.0
-        with:
-          bump_each_commit: true
   
   build-push-container-images:
     runs-on: ubuntu-latest
