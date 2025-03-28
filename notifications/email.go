@@ -29,10 +29,10 @@ func NewEmailNotifier(cfg EmailConfig) (*EmailNotifier, error) {
 }
 
 func (e *EmailNotifier) Notify(message string) error {
-	if e.config.FailuresOnly && strings.Contains(message, "error") {
+	if e.config.FailuresOnly && strings.Contains(message, "failed") {
 		return nil
 	}
-	finalMessage := e.config.Prefix + message
+	finalMessage := e.config.Prefix + " " + message
 	auth := smtp.PlainAuth("", e.config.Username, e.config.Password, e.config.SMTPServer)
 	msg := []byte("To: " + e.config.To + "\r\n" +
 		"Subject: Backup Velero\r\n" +
