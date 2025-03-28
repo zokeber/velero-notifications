@@ -6,9 +6,8 @@ Create a default fullname using the release name and chart name.
 {{- end -}}
 
 {{/*
-Generate a hash from the config data.
+Generate a hash from the values file.
 */}}
 {{- define "velero-notifications.confighash" -}}
-{{- $configData := .Values.config | toYaml -}}
-{{- sha256sum $configData -}}
+{{- toYaml .Values | sha256sum -}}
 {{- end -}}
