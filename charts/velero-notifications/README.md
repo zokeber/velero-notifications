@@ -1,6 +1,6 @@
 # velero-notifications
 
-![Version: 0.1.3](https://img.shields.io/badge/Version-0.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.9](https://img.shields.io/badge/AppVersion-0.0.9-informational?style=flat-square)
+![Version: 0.1.6](https://img.shields.io/badge/Version-0.1.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.12](https://img.shields.io/badge/AppVersion-0.0.12-informational?style=flat-square)
 
 A Helm chart for deploying the Velero Notifications service
 
@@ -20,7 +20,10 @@ A Helm chart for deploying the Velero Notifications service
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| check_interval | int | `300` | The interval, in seconds, that the controller will wait between each check of Velero backups |
+| check_interval | int | `5` | The interval, in seconds, that the controller will wait between each check of Velero backups |
+| configmapLabels | object | `{}` | A set of key-value pairs that will be applied as labels to the ConfigMap resource. These labels can be used for organizational purposes, filtering, and for integration with monitoring or automation tools. |
+| deploymentAnnotations | object | `{}` | A set of key-value pairs that will be added as annotations to the Deployment resource. Annotations store additional, non-identifying metadata that can be used by external tools or for debugging purposes, without affecting resource selection. |
+| deploymentLabels | object | `{}` | A collection of key-value pairs to label the Deployment resource. These labels help in identifying and grouping the deployment, making it easier to manage, monitor, and apply policies across related resources. |
 | email.enabled | bool | `false` | A boolean flag that indicates if email notifications are enabled |
 | email.failures_only | bool | `false` | A boolean flag that specifies if email notifications should only be sent when a backup fails |
 | email.from | string | `"username@gmail.com"` | The email address from which the notifications will be sent. |
@@ -35,6 +38,7 @@ A Helm chart for deploying the Velero Notifications service
 | imagePullSecretsName | string | `""` | Kubernetes secret that stores your registry credentials |
 | namespace | string | `"velero"` | Specifies the Kubernetes namespace where the resources will be deployed |
 | notification_prefix | string | `"[kubernetes-context] "` | A string that is prepended to all notification messages. This helps identify the context of the notifications (e.g., the Kubernetes cluster or environment) |
+| podAnnotations | object | `{}` | A group of key-value pairs that will be attached as annotations to the Pods created by the Deployment. These annotations allow you to add extra metadata to your pods for purposes such as logging, monitoring, or integrating with other services. |
 | resources.limits.cpu | string | `"100m"` | This value sets the maximum CPU the container can use |
 | resources.limits.memory | string | `"96Mi"` | This defines the maximum memory the container is allowed to use |
 | resources.requests.cpu | string | `"50m"` | This value specifies the minimum amount of CPU guaranteed to the container |

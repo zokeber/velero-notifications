@@ -3,6 +3,19 @@ kind: ConfigMap
 metadata:
   name: {{ include "velero-notifications.fullname" . }}-config
   namespace: {{ .Values.namespace | default "velero" | quote }}
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "velero-notifications.fullname" .}}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    {{- if .Values.configmapLabels }}
+    {{- toYaml .Values.configmapLabels | nindent 4 }}
+    {{- end }}
+  annotations:
+    configHash: {{ include "velero-notifications.confighash" . }}
+    meta.helm.sh/release-name: {{ .Release.Name }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
 data:
   config.yaml: |-
     logging:

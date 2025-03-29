@@ -9,11 +9,19 @@ image:
 # -- Specifies the Kubernetes namespace where the resources will be deployed
 namespace: "velero"
 # -- The interval, in seconds, that the controller will wait between each check of Velero backups
-check_interval: 300
+check_interval: 5
 # -- A string that is prepended to all notification messages. This helps identify the context of the notifications (e.g., the Kubernetes cluster or environment)
 notification_prefix: "[kubernetes-context] "
 # -- A boolean value that enables or disables detailed logging. When set to true, the application outputs more detailed logs for debugging and monitoring purposes
 verbose: true
+# -- A set of key-value pairs that will be applied as labels to the ConfigMap resource. These labels can be used for organizational purposes, filtering, and for integration with monitoring or automation tools.
+configmapLabels: {}
+# -- A collection of key-value pairs to label the Deployment resource. These labels help in identifying and grouping the deployment, making it easier to manage, monitor, and apply policies across related resources.
+deploymentLabels: {}
+# -- A set of key-value pairs that will be added as annotations to the Deployment resource. Annotations store additional, non-identifying metadata that can be used by external tools or for debugging purposes, without affecting resource selection.
+deploymentAnnotations: {}
+# -- A group of key-value pairs that will be attached as annotations to the Pods created by the Deployment. These annotations allow you to add extra metadata to your pods for purposes such as logging, monitoring, or integrating with other services.
+podAnnotations: {}
 
 slack:
   # -- A boolean flag that turns Slack notifications on or off.

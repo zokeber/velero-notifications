@@ -4,7 +4,7 @@ logging:
 namespace: "velero"
 check_interval: 5
 notifications:
-  notification_prefix: "Kubernetes Cluster Name"
+  notification_prefix: "[kubernetes context]"
   slack:
     enabled: true
     failures_only: false

@@ -30,6 +30,14 @@ type VeleroController struct {
 	processedBackups map[string]string
 }
 
+func formatTime(tStr string) string {
+    t, err := time.Parse(time.RFC3339, tStr)
+    if err != nil {
+        return tStr
+    }
+    return t.Format("2006-01-02 15:00:00 MST")
+}
+
 func NewVeleroController(namespace string, checkInterval int, verbose bool, notifiers []notifications.Notifier) (*VeleroController, error) {
 	var kubeconfig *string
 	var config *rest.Config
@@ -127,6 +135,25 @@ func extractWarnings(obj map[string]interface{}) int {
 	return warnings
 }
 
+func extractErrors(obj map[string]interface{}) int {
+    errorsCount := 0
+    if e, found, err := unstructured.NestedFieldCopy(obj, "status", "errors"); err == nil && found {
+        switch v := e.(type) {
+        case int:
+            errorsCount = v
+        case int64:
+            errorsCount = int(v)
+        case float64:
+            errorsCount = int(v)
+        case string:
+            if val, err := strconv.Atoi(v); err == nil {
+                errorsCount = val
+            }
+        }
+    }
+    return errorsCount
+}
+
 func (vc *VeleroController) checkBackups() {
 	backupsGVR := schema.GroupVersionResource{
 		Group:    "velero.io",
@@ -135,9 +162,10 @@ func (vc *VeleroController) checkBackups() {
 	}
 
 	list, err := vc.dynClient.Resource(backupsGVR).Namespace(vc.Namespace).List(context.TODO(), metav1.ListOptions{})
+	
 	if err != nil {
-		log.Printf("Error retrieving backups from Velero: %v", err)
-		vc.notifyAll(fmt.Sprintf("Error retrieving backups from Velero: %v", err))
+		log.Printf("Failed to retrieving backups from Velero: %v", err)
+		vc.notifyAll(fmt.Sprintf("Failed to retrieving backups from Velero: %v", err))
 		return
 	}
 
@@ -187,6 +215,7 @@ func (vc *VeleroController) checkBackups() {
 			}
 
 			warnings := extractWarnings(item.Object)
+			errorsCount := extractErrors(item.Object)
 			failureReason := ""
 
 			if phase == "Failed" {
@@ -197,9 +226,9 @@ func (vc *VeleroController) checkBackups() {
 
 			var message string
 			if phase == "Completed" {
-				message = fmt.Sprintf("Backup %s completed successfully.\nStart Time: %s, End Time: %s.\nProgress: %s/%s items processed", backupName, startTimestamp, completionTimestamp, itemsBackedUp, totalItems)
+				message = fmt.Sprintf("Backup %s completed successfully.\nStart Time: %s, End Time: %s.\nProgress: %s/%s items processed", backupName, formatTime(startTimestamp), formatTime(completionTimestamp), itemsBackedUp, totalItems)
 			} else {
-				message = fmt.Sprintf("Backup %s finished with status: %s.\nStart Time: %s, End Time: %s.\nProgress: %s/%s items processed", backupName, phase, startTimestamp, completionTimestamp, itemsBackedUp, totalItems)
+				message = fmt.Sprintf("Backup %s finished with status: %s.\nStart Time: %s, End Time: %s.\nProgress: %s/%s items processed", backupName, phase, formatTime(startTimestamp), formatTime(completionTimestamp), itemsBackedUp, totalItems)
 				if failureReason != "" {
 					message += fmt.Sprintf("\nFailure Reason: %s", failureReason)
 				}
@@ -208,7 +237,11 @@ func (vc *VeleroController) checkBackups() {
 			if warnings > 0 {
 				message += fmt.Sprintf(" (with %d warnings).", warnings)
 			}
-			
+
+			if errorsCount > 0 {
+				message += fmt.Sprintf(" (with %d errors).", errorsCount)
+			}
+						
 			log.Printf(message)
 			vc.notifyAll(message)
 

@@ -50,29 +50,42 @@ func NewSlackNotifier(cfg SlackConfig) (*SlackNotifier, error) {
 
 func (s *SlackNotifier) Notify(message string) error {
 
-	if s.config.FailuresOnly && !strings.Contains(strings.ToLower(message), "failed") {
+	var backupStatus string
+	var color string
+
+	finalMessage := s.config.Prefix + " " + message
+	lowerMsg := strings.ToLower(finalMessage)
+
+	if s.config.FailuresOnly && !strings.Contains(lowerMsg, "failed") {
 		return nil
 	}
 
-	finalMessage := s.config.Prefix + message
-
-	re := regexp.MustCompile(`status:\s*(\w+)`)
-	matches := re.FindStringSubmatch(finalMessage)
-	backupStatus := "Unknown"
-	color := "#FFF000"
-	
-	if len(matches) >= 2 {
-		backupStatus = matches[1]
+	if strings.Contains(lowerMsg, "error retrieving backups from velero") || strings.Contains(lowerMsg, "connection reset by peer") {
+		backupStatus = "Failed"
+	} else {
+		re := regexp.MustCompile(`status:\s*(\w+)`)
+		matches := re.FindStringSubmatch(finalMessage)
+		if len(matches) >= 2 {
+			backupStatus = matches[1]
+		}
 	}
 
-	if strings.ToLower(backupStatus) == "failed" {
-		color = "#FF0000" // red (failed)
-	} else if strings.ToLower(backupStatus) == "partiallyfailed" {
-		color = "#FFA500" // orange (partially failed)
+	switch strings.ToLower(backupStatus) {
+	case "failed":
+		color = "#8B0000" // Default to dark red for failed.
+		backupStatus = "Failed"
+	case "partiallyfailed":
+		color = "#FFA500" // Orange for partially failed.
 		backupStatus = "Partially Failed"
-	} else {
-		color = "#36A64F" // green (success)
+	case "completed":
+		color = "#36A64F" // Green for success.
 		backupStatus = "Completed"
+	case "finalizingpartiallyfailed":
+		color = "#FFFF00"  // Yello for Finalizing Partially Failed
+		backupStatus = "Finalizing Partially Failed"
+	default:
+		color = "#FF0000" // Red if status is unknown.
+		backupStatus = "Unknown"
 	}
 
 	attachment := SlackAttachment{
@@ -100,6 +113,7 @@ func (s *SlackNotifier) Notify(message string) error {
 	}
 
 	body, err := json.Marshal(payload)
+	
 	if err != nil {
 		return err
 	}
@@ -113,5 +127,6 @@ func (s *SlackNotifier) Notify(message string) error {
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
 		return fmt.Errorf("non-OK response from Slack: %d", resp.StatusCode)
 	}
+
 	return nil
 }

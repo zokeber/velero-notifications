@@ -4,7 +4,21 @@ metadata:
   name: {{ include "velero-notifications.fullname" . }}
   namespace: {{ .Values.namespace | default "velero" | quote }}
   labels:
-    app: velero-notifications
+    app: "velero-notifications"
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "velero-notifications.fullname" .}}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    {{- if .Values.deploymentLabels }}
+    {{- toYaml .Values.deploymentLabels | nindent 4 }}
+    {{- end }}
+  annotations:
+    meta.helm.sh/release-name: {{ .Release.Name }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
+  {{- if .Values.deploymentAnnotations }}
+  {{- toYaml .Values.deploymentAnnotations | nindent 4 }}
+  {{- end }}
 spec:
   replicas: {{ .Values.replicaCount | default 1 }}
   strategy:
@@ -15,14 +29,30 @@ spec:
   template:
     metadata:
       labels:
-        app: velero-notifications
+        app: "velero-notifications"
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+        app.kubernetes.io/name: {{ include "velero-notifications.fullname" .}}
+        helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+      {{- if .Values.podLabels }}
+      {{- toYaml .Values.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.podAnnotations }}
+      {{- toYaml .Values.podAnnotations | nindent 8 }}
+      {{- end }}
       annotations:
-        configHash: {{ include "velero-notifications.confighash" . | sha256sum }}
+        configHash: {{ include "velero-notifications.confighash" . }}
+        meta.helm.sh/release-name: {{ .Release.Name }}
+        meta.helm.sh/release-namespace: {{ .Release.Namespace }}
+        {{- if .Values.podAnnotations }}
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+        {{- end }}
     spec:
       serviceAccountName: velero-notifications
       terminationGracePeriodSeconds: 60
       restartPolicy: Always
-      {{- if or .Values.imagePullSecretsName }}
+      {{- if .Values.imagePullSecretsName }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecretsName | quote }}
       {{- end }}
