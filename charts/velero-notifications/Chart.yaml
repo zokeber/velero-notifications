@@ -14,4 +14,4 @@ keywords:
   - velero
   - notifications
 version: 0.1.6
-appVersion: "0.0.12"
+appVersion: "0.0.13"

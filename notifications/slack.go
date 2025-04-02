@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"regexp"
 	"strings"
 	"time"
 )
@@ -40,6 +39,10 @@ type SlackNotifier struct {
 	config SlackConfig
 }
 
+type backupStateInfo struct {
+	displayName string
+	color       string
+}
 
 func NewSlackNotifier(cfg SlackConfig) (*SlackNotifier, error) {
 	if cfg.Webhook == "" {
@@ -56,37 +59,64 @@ func (s *SlackNotifier) Notify(message string) error {
 	finalMessage := s.config.Prefix + " " + message
 	lowerMsg := strings.ToLower(finalMessage)
 
-	if s.config.FailuresOnly && !strings.Contains(lowerMsg, "failed") {
-		return nil
+	// Map of status types to their display properties
+	statusMap := map[string]backupStateInfo{
+		"failed": {
+			displayName: "Failed",
+			color:       "#8B0000", // Dark red for failed state
+		},
+		"partiallyfailed": {
+			displayName: "Partially Failed",
+			color:       "#FFA500", // Orange for partially failed state
+		},
+		"completed": {
+			displayName: "Completed",
+			color:       "#36A64F", // Green for completed state
+		},
+		"finalizingpartiallyfailed": {
+			displayName: "Finalizing Partially Failed",
+			color:       "#FFFF00", // Yellow for finalizing partially failed state
+		},
+		"unknown": {
+			displayName: "Unknown",
+			color:       "#FF0000", // Red for unknown state
+		},
 	}
 
-	if strings.Contains(lowerMsg, "error retrieving backups from velero") || strings.Contains(lowerMsg, "connection reset by peer") {
-		backupStatus = "Failed"
-	} else {
-		re := regexp.MustCompile(`status:\s*(\w+)`)
-		matches := re.FindStringSubmatch(finalMessage)
-		if len(matches) >= 2 {
-			backupStatus = matches[1]
+	// Determine backup status based on message content
+	switch {
+	case strings.Contains(lowerMsg, "error retrieving backups from velero") ||
+		strings.Contains(lowerMsg, "connection reset by peer") ||
+		strings.Contains(lowerMsg, "finished with status: failed"):
+		backupStatus = "failed"
+	case strings.Contains(lowerMsg, "completed successfully"):
+		backupStatus = "completed"
+	case strings.Contains(lowerMsg, "finished with status: partiallyfailed"):
+		backupStatus = "partiallyfailed"
+	case strings.Contains(lowerMsg, "finished with status: finalizingpartiallyfailed"):
+		backupStatus = "finalizingpartiallyfailed"
+	default:
+		backupStatus = "unknown"
+	}
+
+	// If FailuresOnly is enabled, only proceed for failure states
+	if s.config.FailuresOnly {
+		switch backupStatus {
+		case "failed", "partiallyfailed", "finalizingpartiallyfailed", "unknown":
+
+		default:
+			return nil
 		}
 	}
 
-	switch strings.ToLower(backupStatus) {
-	case "failed":
-		color = "#8B0000" // Default to dark red for failed.
-		backupStatus = "Failed"
-	case "partiallyfailed":
-		color = "#FFA500" // Orange for partially failed.
-		backupStatus = "Partially Failed"
-	case "completed":
-		color = "#36A64F" // Green for success.
-		backupStatus = "Completed"
-	case "finalizingpartiallyfailed":
-		color = "#FFFF00"  // Yello for Finalizing Partially Failed
-		backupStatus = "Finalizing Partially Failed"
-	default:
-		color = "#FF0000" // Red if status is unknown.
-		backupStatus = "Unknown"
+	// Get status info from the map, defaulting to unknown if not found
+	statusInfo, exists := statusMap[strings.ToLower(backupStatus)]
+	if !exists {
+		statusInfo = statusMap["unknown"]
 	}
+
+	backupStatus = statusInfo.displayName
+	color = statusInfo.color
 
 	attachment := SlackAttachment{
 		Fallback:   finalMessage,
@@ -113,7 +143,7 @@ func (s *SlackNotifier) Notify(message string) error {
 	}
 
 	body, err := json.Marshal(payload)
-	
+
 	if err != nil {
 		return err
 	}
@@ -122,7 +152,7 @@ func (s *SlackNotifier) Notify(message string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
 		return fmt.Errorf("non-OK response from Slack: %d", resp.StatusCode)
