@@ -2,10 +2,10 @@ apiVersion: v1
 entries:
   velero-notifications:
   - apiVersion: v2
-    appVersion: 0.0.12
-    created: "2025-03-29T00:03:10.133606005Z"
+    appVersion: 0.0.13
+    created: "2025-04-02T17:03:46.977389312Z"
     description: A Helm chart for deploying the Velero Notifications service
-    digest: b5536580a5e38ed80ec23c6c94113a59455c8f50f627bab82a7d25db2e6d1828
+    digest: 814debad9f6d8cbe6b45d2db8cc47c0c432b72b6ea3976756231405b5e21e059
     home: https://github.com/zokeber/velero-notifications
     icon: https://onthedock.github.io/images/velero.jpg
     keywords:
@@ -127,4 +127,4 @@ entries:
     urls:
     - https://zokeber.github.io/velero-notifications/velero-notifications-0.1.1.tgz
     version: 0.1.1
-generated: "2025-03-29T00:03:10.133015453Z"
+generated: "2025-04-02T17:03:46.976536477Z"
