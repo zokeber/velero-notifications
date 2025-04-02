@@ -8,6 +8,7 @@ import (
 	"log"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -182,10 +183,10 @@ func (vc *VeleroController) checkBackups() {
 		}
 
 		if _, exists := vc.processedBackups[backupName]; !exists {
-			if phase == "InProgress" {
+			if phase == "InProgress" || phase == "Finalizing" {
 				vc.processedBackups[backupName] = phase
 				if vc.Verbose {
-					log.Printf("New backup detected in progress: %s.", backupName)
+					log.Printf("New backup detected in %s: %s.", strings.ToLower(phase), backupName)
 				}
 			}
 			continue
@@ -193,7 +194,7 @@ func (vc *VeleroController) checkBackups() {
 
 		prevState := vc.processedBackups[backupName]
 		
-		if prevState == "InProgress" && phase != "InProgress" {
+		if (prevState == "InProgress" && phase != "InProgress") || (prevState == "Finalizing" && phase != "Finalizing") {
 			completionTimestamp, found, err := unstructured.NestedString(item.Object, "status", "completionTimestamp")
 			if err != nil || !found {
 				completionTimestamp = "Unknown"
@@ -248,8 +249,8 @@ func (vc *VeleroController) checkBackups() {
 			vc.processedBackups[backupName] = phase
 		}
 
-		if vc.Verbose && phase == "InProgress" {
-			log.Printf("Backup %s is still in progress.", backupName)
+		if vc.Verbose && (phase == "InProgress" || phase == "Finalizing") {
+			log.Printf("Backup %s is still in %s.", backupName, strings.ToLower(phase))
 		}
 	}
 }
