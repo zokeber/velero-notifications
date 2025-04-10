@@ -77,6 +77,10 @@ func (s *SlackNotifier) Notify(message string) error {
 			displayName: "Finalizing Partially Failed",
 			color:       "#FFFF00", // Yellow for finalizing partially failed state
 		},
+		"finalizing": {
+			displayName: "Finalizing",
+			color:       "#025A13", // Dark green for finalizing state
+		},
 		"unknown": {
 			displayName: "Unknown",
 			color:       "#FF0000", // Red for unknown state
@@ -95,6 +99,8 @@ func (s *SlackNotifier) Notify(message string) error {
 		backupStatus = "partiallyfailed"
 	case strings.Contains(lowerMsg, "finished with status: finalizingpartiallyfailed"):
 		backupStatus = "finalizingpartiallyfailed"
+	case strings.Contains(lowerMsg, "finished with status: finalizing"):
+		backupStatus = "finalizing"
 	default:
 		backupStatus = "unknown"
 	}
@@ -102,7 +108,7 @@ func (s *SlackNotifier) Notify(message string) error {
 	// If FailuresOnly is enabled, only proceed for failure states
 	if s.config.FailuresOnly {
 		switch backupStatus {
-		case "failed", "partiallyfailed", "finalizingpartiallyfailed", "unknown":
+		case "failed", "partiallyfailed", "finalizingpartiallyfailed", "unknown", "finalizing":
 
 		default:
 			return nil
