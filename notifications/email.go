@@ -22,8 +22,8 @@ type EmailConfig struct {
 }
 
 func NewEmailNotifier(cfg EmailConfig) (*EmailNotifier, error) {
-	if cfg.SMTPServer == "" || cfg.Username == "" || cfg.Password == "" {
-		return nil, fmt.Errorf("Error trying to configure email")
+	if cfg.SMTPServer == "" {
+		return nil, fmt.Errorf("error trying to configure email")
 	}
 	return &EmailNotifier{config: cfg}, nil
 }
@@ -32,12 +32,16 @@ func (e *EmailNotifier) Notify(message string) error {
 	if e.config.FailuresOnly && strings.Contains(message, "failed") {
 		return nil
 	}
-	finalMessage := e.config.Prefix + " " + message
-	auth := smtp.PlainAuth("", e.config.Username, e.config.Password, e.config.SMTPServer)
+
+	var auth smtp.Auth
+	if e.config.Username != "" && e.config.Password != "" {
+		auth = smtp.PlainAuth("", e.config.Username, e.config.Password, e.config.SMTPServer)
+	}
+
 	msg := []byte("To: " + e.config.To + "\r\n" +
-		"Subject: Backup Velero\r\n" +
+		"Subject: " + e.config.Prefix + " Backup Velero\r\n" +
 		"\r\n" +
-		finalMessage + 
+		message +
 		"\r\n")
 	addr := fmt.Sprintf("%s:%d", e.config.SMTPServer, e.config.SMTPPort)
 	return smtp.SendMail(addr, auth, e.config.From, []string{e.config.To}, msg)
