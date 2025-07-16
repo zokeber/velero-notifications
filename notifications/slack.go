@@ -51,7 +51,7 @@ func NewSlackNotifier(cfg SlackConfig) (*SlackNotifier, error) {
 	return &SlackNotifier{config: cfg}, nil
 }
 
-func (s *SlackNotifier) Notify(message string) error {
+func (s *SlackNotifier) Notify(status, message string) error {
 
 	var backupStatus string
 	var color string

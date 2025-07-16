@@ -28,7 +28,7 @@ func NewEmailNotifier(cfg EmailConfig) (*EmailNotifier, error) {
 	return &EmailNotifier{config: cfg}, nil
 }
 
-func (e *EmailNotifier) Notify(message string) error {
+func (e *EmailNotifier) Notify(status, message string) error {
 	if e.config.FailuresOnly && strings.Contains(message, "failed") {
 		return nil
 	}
@@ -39,7 +39,7 @@ func (e *EmailNotifier) Notify(message string) error {
 	}
 
 	msg := []byte("To: " + e.config.To + "\r\n" +
-		"Subject: " + e.config.Prefix + " Backup Velero\r\n" +
+		"Subject: " + e.config.Prefix + " Backup " + status + "\r\n" +
 		"\r\n" +
 		message +
 		"\r\n")
