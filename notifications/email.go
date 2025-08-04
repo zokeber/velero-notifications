@@ -3,7 +3,6 @@ package notifications
 import (
 	"fmt"
 	"net/smtp"
-	"strings"
 )
 
 type EmailNotifier struct {
@@ -29,8 +28,14 @@ func NewEmailNotifier(cfg EmailConfig) (*EmailNotifier, error) {
 }
 
 func (e *EmailNotifier) Notify(status, message string) error {
-	if e.config.FailuresOnly && strings.Contains(message, "failed") {
-		return nil
+	// If FailuresOnly is enabled, only proceed for failure states
+	if e.config.FailuresOnly {
+		switch status {
+		case "failed", "partiallyfailed", "finalizingpartiallyfailed", "unknown", "finalizing":
+
+		default:
+			return nil
+		}
 	}
 
 	var auth smtp.Auth
