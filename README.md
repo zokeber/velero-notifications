@@ -92,3 +92,21 @@ This project is licensed under the Apache License.
 ## Contact
 
 For any questions or issues, please open an issue on GitHub.
+
+## Backup Phases
+
+New
+FailedValidation
+InProgress
+WaitingForPluginOperations
+WaitingForPluginOperationsPartiallyFailed
+Finalizing
+FinalizingPartiallyFailed
+Completed
+PartiallyFailed
+Failed
+Deleting
+
+## Build
+
+docker build -t hub.bizmate.it/public/velero-notifications .

@@ -192,9 +192,7 @@ func (vc *VeleroController) checkBackups() {
 			continue
 		}
 
-		prevState := vc.processedBackups[backupName]
-
-		if (prevState == "InProgress" && phase != "InProgress") || (prevState == "Finalizing" && phase != "Finalizing") {
+		if phase == "Completed" || phase == "PartiallyFailed" || phase == "Failed" {
 			completionTimestamp, found, err := unstructured.NestedString(item.Object, "status", "completionTimestamp")
 			if err != nil || !found {
 				completionTimestamp = "Unknown"
@@ -243,7 +241,7 @@ func (vc *VeleroController) checkBackups() {
 				message += fmt.Sprintf(" (with %d errors).", errorsCount)
 			}
 
-			log.Printf(message)
+			log.Println(message)
 			vc.notifyAll(phase, message)
 
 			vc.processedBackups[backupName] = phase
