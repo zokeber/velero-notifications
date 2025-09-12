@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -183,10 +182,10 @@ func (vc *VeleroController) checkBackups() {
 		}
 
 		if _, exists := vc.processedBackups[backupName]; !exists {
-			if phase == "InProgress" || phase == "Finalizing" {
+			if phase == "InProgress" || phase == "Finalizing" || phase == "WaitingForPluginOperations" {
 				vc.processedBackups[backupName] = phase
 				if vc.Verbose {
-					log.Printf("New backup detected in %s: %s.", strings.ToLower(phase), backupName)
+					log.Printf("New backup detected in %s: %s.", phase, backupName)
 				}
 			}
 			continue
@@ -225,9 +224,9 @@ func (vc *VeleroController) checkBackups() {
 
 			var message string
 			if phase == "Completed" {
-				message = fmt.Sprintf("Backup %s completed successfully.\nStart Time: %s, End Time: %s.\nProgress: %s/%s items processed", backupName, formatTime(startTimestamp), formatTime(completionTimestamp), itemsBackedUp, totalItems)
+				message = fmt.Sprintf("Backup %s completed successfully.\n\nStart Time: %s, End Time: %s.\n\nProgress: %s/%s items processed", backupName, formatTime(startTimestamp), formatTime(completionTimestamp), itemsBackedUp, totalItems)
 			} else {
-				message = fmt.Sprintf("Backup %s finished with status: %s.\nStart Time: %s, End Time: %s.\nProgress: %s/%s items processed", backupName, phase, formatTime(startTimestamp), formatTime(completionTimestamp), itemsBackedUp, totalItems)
+				message = fmt.Sprintf("Backup %s finished with status: %s.\n\nStart Time: %s, End Time: %s.\n\nProgress: %s/%s items processed", backupName, phase, formatTime(startTimestamp), formatTime(completionTimestamp), itemsBackedUp, totalItems)
 				if failureReason != "" {
 					message += fmt.Sprintf("\nFailure Reason: %s", failureReason)
 				}
@@ -244,11 +243,11 @@ func (vc *VeleroController) checkBackups() {
 			log.Println(message)
 			vc.notifyAll(phase, message)
 
-			vc.processedBackups[backupName] = phase
+			delete(vc.processedBackups, backupName)
 		}
 
-		if vc.Verbose && (phase == "InProgress" || phase == "Finalizing") {
-			log.Printf("Backup %s is still in %s.", backupName, strings.ToLower(phase))
+		if vc.Verbose && (phase == "InProgress" || phase == "Finalizing" || phase == "WaitingForPluginOperations") {
+			log.Printf("Backup %s is still in %s.", backupName, phase)
 		}
 	}
 }

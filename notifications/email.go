@@ -2,6 +2,7 @@ package notifications
 
 import (
 	"fmt"
+	"log"
 	"net/smtp"
 )
 
@@ -28,10 +29,11 @@ func NewEmailNotifier(cfg EmailConfig) (*EmailNotifier, error) {
 }
 
 func (e *EmailNotifier) Notify(status, message string) error {
+	log.Printf("[Email] Sending notification for %s: %s", status, message)
 	// If FailuresOnly is enabled, only proceed for failure states
 	if e.config.FailuresOnly {
 		switch status {
-		case "failed", "partiallyfailed", "finalizingpartiallyfailed", "unknown", "finalizing":
+		case "Failed", "PartiallyFailed", "FinalizingPartiallyFailed", "Unknown":
 
 		default:
 			return nil
