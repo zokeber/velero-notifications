@@ -109,4 +109,4 @@ Deleting
 
 ## Build
 
-docker build -t hub.bizmate.it/public/velero-notifications .
+docker build -t velero-notifications .
