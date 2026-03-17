@@ -11,7 +11,7 @@ namespace: "velero"
 # -- The interval, in seconds, that the controller will wait between each check of Velero backups
 check_interval: 5
 # -- A string that is prepended to all notification messages. This helps identify the context of the notifications (e.g., the Kubernetes cluster or environment)
-notification_prefix: "[kubernetes-context] "
+notification_prefix: "[Velero] "
 # -- A boolean value that enables or disables detailed logging. When set to true, the application outputs more detailed logs for debugging and monitoring purposes
 verbose: true
 # -- A set of key-value pairs that will be applied as labels to the ConfigMap resource. These labels can be used for organizational purposes, filtering, and for integration with monitoring or automation tools.

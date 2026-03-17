@@ -1,6 +1,6 @@
 # velero-notifications
 
-![Version: 0.1.8](https://img.shields.io/badge/Version-0.1.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.15](https://img.shields.io/badge/AppVersion-0.0.15-informational?style=flat-square)
+![Version: 0.1.9](https://img.shields.io/badge/Version-0.1.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.16](https://img.shields.io/badge/AppVersion-0.0.16-informational?style=flat-square)
 
 A Helm chart for deploying the Velero Notifications service
 
@@ -37,7 +37,7 @@ A Helm chart for deploying the Velero Notifications service
 | image.tag | string | `""` | The tag for the container image, which here is set to "latest" |
 | imagePullSecretsName | string | `""` | Kubernetes secret that stores your registry credentials |
 | namespace | string | `"velero"` | Specifies the Kubernetes namespace where the resources will be deployed |
-| notification_prefix | string | `"[kubernetes-context] "` | A string that is prepended to all notification messages. This helps identify the context of the notifications (e.g., the Kubernetes cluster or environment) |
+| notification_prefix | string | `"[Velero] "` | A string that is prepended to all notification messages. This helps identify the context of the notifications (e.g., the Kubernetes cluster or environment) |
 | podAnnotations | object | `{}` | A group of key-value pairs that will be attached as annotations to the Pods created by the Deployment. These annotations allow you to add extra metadata to your pods for purposes such as logging, monitoring, or integrating with other services. |
 | resources.limits.cpu | string | `"100m"` | This value sets the maximum CPU the container can use |
 | resources.limits.memory | string | `"96Mi"` | This defines the maximum memory the container is allowed to use |
