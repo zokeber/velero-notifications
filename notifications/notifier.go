@@ -1,5 +1,5 @@
 package notifications
 
 type Notifier interface {
-	Notify(message string) error
+	Notify(status, message string) error
 }

@@ -1,18 +1,17 @@
 package controller
 
 import (
-	"os"
 	"context"
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
@@ -32,11 +31,11 @@ type VeleroController struct {
 }
 
 func formatTime(tStr string) string {
-    t, err := time.Parse(time.RFC3339, tStr)
-    if err != nil {
-        return tStr
-    }
-    return t.Format("2006-01-02 15:00:00 MST")
+	t, err := time.Parse(time.RFC3339, tStr)
+	if err != nil {
+		return tStr
+	}
+	return t.Format("2006-01-02 15:00:00 MST")
 }
 
 func NewVeleroController(namespace string, checkInterval int, verbose bool, notifiers []notifications.Notifier) (*VeleroController, error) {
@@ -75,7 +74,7 @@ func NewVeleroController(namespace string, checkInterval int, verbose bool, noti
 	}
 
 	dynClient, err := dynamic.NewForConfig(config)
-	
+
 	if err != nil {
 		log.Fatalf("Error creating dynamic client: %v", err)
 	}
@@ -109,9 +108,9 @@ func (vc *VeleroController) Run(ctx context.Context) {
 	}
 }
 
-func (vc *VeleroController) notifyAll(message string) {
+func (vc *VeleroController) notifyAll(status, message string) {
 	for _, notifier := range vc.Notifiers {
-		if err := notifier.Notify(message); err != nil {
+		if err := notifier.Notify(status, message); err != nil {
 			log.Printf("Error sending notifications: %v", err)
 		}
 	}
@@ -137,22 +136,22 @@ func extractWarnings(obj map[string]interface{}) int {
 }
 
 func extractErrors(obj map[string]interface{}) int {
-    errorsCount := 0
-    if e, found, err := unstructured.NestedFieldCopy(obj, "status", "errors"); err == nil && found {
-        switch v := e.(type) {
-        case int:
-            errorsCount = v
-        case int64:
-            errorsCount = int(v)
-        case float64:
-            errorsCount = int(v)
-        case string:
-            if val, err := strconv.Atoi(v); err == nil {
-                errorsCount = val
-            }
-        }
-    }
-    return errorsCount
+	errorsCount := 0
+	if e, found, err := unstructured.NestedFieldCopy(obj, "status", "errors"); err == nil && found {
+		switch v := e.(type) {
+		case int:
+			errorsCount = v
+		case int64:
+			errorsCount = int(v)
+		case float64:
+			errorsCount = int(v)
+		case string:
+			if val, err := strconv.Atoi(v); err == nil {
+				errorsCount = val
+			}
+		}
+	}
+	return errorsCount
 }
 
 func (vc *VeleroController) checkBackups() {
@@ -163,10 +162,10 @@ func (vc *VeleroController) checkBackups() {
 	}
 
 	list, err := vc.dynClient.Resource(backupsGVR).Namespace(vc.Namespace).List(context.TODO(), metav1.ListOptions{})
-	
+
 	if err != nil {
 		log.Printf("Failed to retrieving backups from Velero: %v", err)
-		vc.notifyAll(fmt.Sprintf("Failed to retrieving backups from Velero: %v", err))
+		vc.notifyAll("Error", fmt.Sprintf("Failed to retrieving backups from Velero: %v", err))
 		return
 	}
 
@@ -183,18 +182,16 @@ func (vc *VeleroController) checkBackups() {
 		}
 
 		if _, exists := vc.processedBackups[backupName]; !exists {
-			if phase == "InProgress" || phase == "Finalizing" {
+			if phase == "InProgress" || phase == "Finalizing" || phase == "WaitingForPluginOperations" {
 				vc.processedBackups[backupName] = phase
 				if vc.Verbose {
-					log.Printf("New backup detected in %s: %s.", strings.ToLower(phase), backupName)
+					log.Printf("New backup detected in %s: %s.", phase, backupName)
 				}
 			}
 			continue
 		}
 
-		prevState := vc.processedBackups[backupName]
-		
-		if (prevState == "InProgress" && phase != "InProgress") || (prevState == "Finalizing" && phase != "Finalizing") {
+		if phase == "Completed" || phase == "PartiallyFailed" || phase == "Failed" {
 			completionTimestamp, found, err := unstructured.NestedString(item.Object, "status", "completionTimestamp")
 			if err != nil || !found {
 				completionTimestamp = "Unknown"
@@ -227,14 +224,14 @@ func (vc *VeleroController) checkBackups() {
 
 			var message string
 			if phase == "Completed" {
-				message = fmt.Sprintf("Backup %s completed successfully.\nStart Time: %s, End Time: %s.\nProgress: %s/%s items processed", backupName, formatTime(startTimestamp), formatTime(completionTimestamp), itemsBackedUp, totalItems)
+				message = fmt.Sprintf("Backup %s completed successfully.\n\nStart Time: %s, End Time: %s.\n\nProgress: %s/%s items processed", backupName, formatTime(startTimestamp), formatTime(completionTimestamp), itemsBackedUp, totalItems)
 			} else {
-				message = fmt.Sprintf("Backup %s finished with status: %s.\nStart Time: %s, End Time: %s.\nProgress: %s/%s items processed", backupName, phase, formatTime(startTimestamp), formatTime(completionTimestamp), itemsBackedUp, totalItems)
+				message = fmt.Sprintf("Backup %s finished with status: %s.\n\nStart Time: %s, End Time: %s.\n\nProgress: %s/%s items processed", backupName, phase, formatTime(startTimestamp), formatTime(completionTimestamp), itemsBackedUp, totalItems)
 				if failureReason != "" {
 					message += fmt.Sprintf("\nFailure Reason: %s", failureReason)
 				}
 			}
-			
+
 			if warnings > 0 {
 				message += fmt.Sprintf(" (with %d warnings).", warnings)
 			}
@@ -242,15 +239,15 @@ func (vc *VeleroController) checkBackups() {
 			if errorsCount > 0 {
 				message += fmt.Sprintf(" (with %d errors).", errorsCount)
 			}
-						
-			log.Printf(message)
-			vc.notifyAll(message)
 
-			vc.processedBackups[backupName] = phase
+			log.Println(message)
+			vc.notifyAll(phase, message)
+
+			delete(vc.processedBackups, backupName)
 		}
 
-		if vc.Verbose && (phase == "InProgress" || phase == "Finalizing") {
-			log.Printf("Backup %s is still in %s.", backupName, strings.ToLower(phase))
+		if vc.Verbose && (phase == "InProgress" || phase == "Finalizing" || phase == "WaitingForPluginOperations") {
+			log.Printf("Backup %s is still in %s.", backupName, phase)
 		}
 	}
 }

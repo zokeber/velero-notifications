@@ -1,14 +1,15 @@
 package config
 
 import (
-	"io/ioutil"
+	"os"
+
 	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
 	Logging struct {
-		Level string `yaml:"level"`
-		Verbose bool `yaml:"verbose"`
+		Level   string `yaml:"level"`
+		Verbose bool   `yaml:"verbose"`
 	} `yaml:"logging"`
 	Namespace     string `yaml:"namespace"`
 	CheckInterval int    `yaml:"check_interval"`
@@ -24,7 +25,7 @@ type Config struct {
 		Email struct {
 			Enabled      bool   `yaml:"enabled"`
 			FailuresOnly bool   `yaml:"failures_only"`
-			SMTPServer 	 string `yaml:"smtp_server"`
+			SMTPServer   string `yaml:"smtp_server"`
 			SMTPPort     int    `yaml:"smtp_port"`
 			Username     string `yaml:"username"`
 			Password     string `yaml:"password"`
@@ -35,15 +36,15 @@ type Config struct {
 }
 
 func LoadConfig(path string) (*Config, error) {
-	
-	data, err := ioutil.ReadFile(path)
-	
+
+	data, err := os.ReadFile(path)
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	var cfg Config
-	
+
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		return nil, err
 	}
@@ -51,6 +52,6 @@ func LoadConfig(path string) (*Config, error) {
 	if cfg.CheckInterval < 2 {
 		cfg.CheckInterval = 2
 	}
-	
+
 	return &cfg, nil
 }

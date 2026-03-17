@@ -7,9 +7,8 @@ import (
 	"time"
 
 	"github.com/zokeber/velero-notifications/config"
-	"github.com/zokeber/velero-notifications/controllers"
+	controller "github.com/zokeber/velero-notifications/controllers"
 	"github.com/zokeber/velero-notifications/notifications"
-
 )
 
 func main() {
@@ -23,7 +22,7 @@ func main() {
 	}
 
 	var notifiers []notifications.Notifier
-	
+
 	if cfg.Notifications.Slack.Enabled {
 		slackNotifier, err := notifications.NewSlackNotifier(notifications.SlackConfig{
 			Webhook:      cfg.Notifications.Slack.Webhook,
@@ -63,7 +62,7 @@ func main() {
 		cfg.Logging.Verbose,
 		notifiers,
 	)
-	
+
 	if err != nil {
 		log.Fatalf("Unable to initialize Velero Controller: %v", err)
 	}
@@ -71,9 +70,7 @@ func main() {
 	ctx := context.Background()
 	go veleroController.Run(ctx)
 
-	select {
-	case <-ctx.Done():
-		log.Println("Exit")
-		time.Sleep(2 * time.Second)
-	}
+	<-ctx.Done()
+	log.Println("Exit")
+	time.Sleep(2 * time.Second)
 }
