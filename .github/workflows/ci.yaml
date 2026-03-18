@@ -15,8 +15,7 @@ on:
       - "charts/**"
       - ".github/workflows/**"
       - "golangci.yml"
-    paths-ignore:
-      - "**/*.md"
+      - "!**/*.md"
 
 permissions:
   contents: read

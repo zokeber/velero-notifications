@@ -6,8 +6,7 @@ on:
       - "main"
     paths:
       - "charts/**"
-    paths-ignore:
-      - "charts/**/*.md"
+      - "!charts/**/*.md"
 
 permissions:
   actions: read
