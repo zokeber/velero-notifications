@@ -21,6 +21,7 @@ jobs:
 
     outputs:
       version: ${{ steps.semantic-version.outputs.version }}
+      version_tag: ${{ steps.semantic-version.outputs.version_tag }}
 
     steps:
       - name: Checkout
@@ -67,3 +68,4 @@ jobs:
           tags: |
             ghcr.io/${{ GITHUB.REPOSITORY }}:latest
             ghcr.io/${{ GITHUB.REPOSITORY }}:${{needs.build.outputs.version}}
+            ghcr.io/${{ GITHUB.REPOSITORY }}:${{needs.build.outputs.version_tag}}
