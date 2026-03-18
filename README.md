@@ -81,6 +81,56 @@ email:
 
 Please looking at the [Helm Chart Readme file](https://github.com/zokeber/velero-notifications/blob/main/charts/velero-notifications/README.md) to setting up or overriding some values.
 
+## Testing Against a Kubernetes Cluster
+
+Use this flow to validate Slack notifications against a real cluster.
+
+### Prerequisites
+
+- `kubectl` and `velero` CLI installed and configured.
+- Velero installed in the target cluster (namespace `velero` by default).
+- `config/config.yaml` updated with valid Slack settings (`notifications.slack.enabled`, `webhook_url`, `channel`, `username`).
+- The webhook URL should be kept secret and never committed to git.
+
+### 1) Switch to the context where Velero is installed
+
+```bash
+kubectl config get-contexts
+kubectl config use-context <your-context-with-velero>
+kubectl get deployment velero -n velero
+kubectl get pods -n velero
+```
+
+### 2) Run velero-notifications locally against that cluster
+
+```bash
+go run . -config config/config.yaml
+```
+
+Keep this process running to watch backup events.
+
+### 3) Trigger a backup to generate a notification
+
+```bash
+velero backup create vn-test --include-namespaces default --wait
+```
+
+Expected result:
+- A new Slack message is posted to the configured channel.
+- The message includes status and backup details from the completed backup.
+
+### 4) Validate and cleanup
+
+```bash
+velero backup describe vn-test --details
+velero backup delete vn-test --confirm
+```
+
+If no Slack message is sent, verify:
+- `notifications.slack.enabled: true` in `config/config.yaml`
+- `notifications.slack.failures_only` behavior
+- Velero backup phase transitions and application logs
+
 ## Contributing
 
 We welcome contributions from the community! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for details on our code style, branching model, and how to submit pull requests.

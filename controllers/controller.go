@@ -35,7 +35,7 @@ func formatTime(tStr string) string {
 	if err != nil {
 		return tStr
 	}
-	return t.Format("2006-01-02 15:00:00 MST")
+	return t.Format("01/02/06 at 3:04 PM MST")
 }
 
 func NewVeleroController(namespace string, checkInterval int, verbose bool, notifiers []notifications.Notifier) (*VeleroController, error) {
