@@ -14,7 +14,7 @@ on:
       - "notifications/**"
       - "charts/**"
       - ".github/workflows/**"
-      - "golangci.yml"
+      - ".golangci.yml"
       - "!**/*.md"
 
 permissions:
@@ -80,7 +80,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.62.2
-          args: --config=golangci.yml
+          args: --config=.golangci.yml
 
   test:
     if: ${{ !github.event.pull_request.draft }}
