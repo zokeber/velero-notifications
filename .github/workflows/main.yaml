@@ -3,6 +3,10 @@ name: build and push container image
 on:
   push:
     branches: ["main"]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "charts/**"
 
 permissions:
   contents: read
@@ -27,6 +31,8 @@ jobs:
       - name: Application version
         id: semantic-version
         uses: paulhatch/semantic-version@v5.4.0
+        with:
+          tag_prefix: "v"
   
   build-push-container-images:
     runs-on: ubuntu-latest
@@ -56,6 +62,8 @@ jobs:
         with:
           platforms: linux/arm64, linux/amd64
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ghcr.io/${{ GITHUB.REPOSITORY }}:latest
             ghcr.io/${{ GITHUB.REPOSITORY }}:${{needs.build.outputs.version}}
