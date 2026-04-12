@@ -45,7 +45,7 @@ func main() {
 			Username:     cfg.Notifications.Email.Username,
 			Password:     cfg.Notifications.Email.Password,
 			From:         cfg.Notifications.Email.From,
-			To:           cfg.Notifications.Email.To,
+			To:           []string(cfg.Notifications.Email.To),
 			FailuresOnly: cfg.Notifications.Email.FailuresOnly,
 			Prefix:       cfg.Notifications.NotificationPrefix,
 		})
