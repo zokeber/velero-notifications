@@ -23,14 +23,14 @@ type Config struct {
 			Username     string `yaml:"username"`
 		} `yaml:"slack"`
 		Email struct {
-			Enabled      bool   `yaml:"enabled"`
-			FailuresOnly bool   `yaml:"failures_only"`
-			SMTPServer   string `yaml:"smtp_server"`
-			SMTPPort     int    `yaml:"smtp_port"`
-			Username     string `yaml:"username"`
-			Password     string `yaml:"password"`
-			From         string `yaml:"from"`
-			To           string `yaml:"to"`
+			Enabled      bool     `yaml:"enabled"`
+			FailuresOnly bool     `yaml:"failures_only"`
+			SMTPServer   string   `yaml:"smtp_server"`
+			SMTPPort     int      `yaml:"smtp_port"`
+			Username     string   `yaml:"username"`
+			Password     string   `yaml:"password"`
+			From         string   `yaml:"from"`
+			To           []string `yaml:"to"`
 		} `yaml:"email"`
 	} `yaml:"notifications"`
 }

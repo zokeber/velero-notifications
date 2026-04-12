@@ -2,13 +2,13 @@ apiVersion: v2
 name: velero-notifications
 description: A Helm chart for deploying the Velero Notifications service
 type: application
-home: https://github.com/zokeber/velero-notifications
+home: https://github.com/sefranjo/velero-notifications
 maintainers:
   - name: Daniel Monagas
     email: daniel@monagas.io
     url: "https://github.com/zokeber"
 sources:
-  - https://github.com/zokeber/velero-notifications
+  - https://github.com/sefranjo/velero-notifications
 icon: https://onthedock.github.io/images/velero.jpg
 keywords:
   - velero

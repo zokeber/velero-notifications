@@ -19,4 +19,4 @@ notifications:
     username: ""
     password: ""
     from: ""
-    to: ""
+    to: []
