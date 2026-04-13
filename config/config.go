@@ -1,10 +1,47 @@
 package config
 
 import (
+	"fmt"
 	"os"
-
+	"strings"
 	"gopkg.in/yaml.v2"
 )
+
+type EmailRecipients []string
+
+func (r *EmailRecipients) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var raw interface{}
+	if err := unmarshal(&raw); err != nil {
+		return err
+	}
+
+	switch v := raw.(type) {
+	case string:
+		if v == "" {
+			*r = nil
+			return nil
+		}
+		parts := strings.Split(v, ",")
+		for i := range parts {
+			parts[i] = strings.TrimSpace(parts[i])
+		}
+		*r = parts
+		return nil
+	case []interface{}:
+		result := make([]string, 0, len(v))
+		for _, item := range v {
+			if str, ok := item.(string); ok {
+				result = append(result, strings.TrimSpace(str))
+			} else {
+				return fmt.Errorf("email recipient must be a string")
+			}
+		}
+		*r = result
+		return nil
+	default:
+		return fmt.Errorf("unsupported yaml type for email recipients: %T", raw)
+	}
+}
 
 type Config struct {
 	Logging struct {
@@ -23,14 +60,14 @@ type Config struct {
 			Username     string `yaml:"username"`
 		} `yaml:"slack"`
 		Email struct {
-			Enabled      bool   `yaml:"enabled"`
-			FailuresOnly bool   `yaml:"failures_only"`
-			SMTPServer   string `yaml:"smtp_server"`
-			SMTPPort     int    `yaml:"smtp_port"`
-			Username     string `yaml:"username"`
-			Password     string `yaml:"password"`
-			From         string `yaml:"from"`
-			To           string `yaml:"to"`
+			Enabled      bool            `yaml:"enabled"`
+			FailuresOnly bool            `yaml:"failures_only"`
+			SMTPServer   string          `yaml:"smtp_server"`
+			SMTPPort     int             `yaml:"smtp_port"`
+			Username     string          `yaml:"username"`
+			Password     string          `yaml:"password"`
+			From         string          `yaml:"from"`
+			To           EmailRecipients `yaml:"to"`
 		} `yaml:"email"`
 	} `yaml:"notifications"`
 }

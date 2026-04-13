@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/smtp"
+	"strings"
 )
 
 type EmailNotifier struct {
@@ -16,7 +17,7 @@ type EmailConfig struct {
 	Username     string
 	Password     string
 	From         string
-	To           string
+	To           []string
 	FailuresOnly bool
 	Prefix       string
 }
@@ -24,6 +25,9 @@ type EmailConfig struct {
 func NewEmailNotifier(cfg EmailConfig) (*EmailNotifier, error) {
 	if cfg.SMTPServer == "" {
 		return nil, fmt.Errorf("error trying to configure email")
+	}
+	if len(cfg.To) == 0 {
+		return nil, fmt.Errorf("email notifier requires at least one recipient")
 	}
 	return &EmailNotifier{config: cfg}, nil
 }
@@ -45,11 +49,11 @@ func (e *EmailNotifier) Notify(status, message string) error {
 		auth = smtp.PlainAuth("", e.config.Username, e.config.Password, e.config.SMTPServer)
 	}
 
-	msg := []byte("To: " + e.config.To + "\r\n" +
+	msg := []byte("To: " + strings.Join(e.config.To, ", ") + "\r\n" +
 		"Subject: " + e.config.Prefix + " Backup " + status + "\r\n" +
 		"\r\n" +
 		message +
 		"\r\n")
 	addr := fmt.Sprintf("%s:%d", e.config.SMTPServer, e.config.SMTPPort)
-	return smtp.SendMail(addr, auth, e.config.From, []string{e.config.To}, msg)
+	return smtp.SendMail(addr, auth, e.config.From, e.config.To, msg)
 }
