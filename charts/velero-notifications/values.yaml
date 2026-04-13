@@ -51,6 +51,10 @@ email:
   # -- The email address from which the notifications will be sent.
   from: "username@gmail.com"
   # -- The recipient email address that will receive the notifications.
+  # -- Use a YAML list for multiple recipients:
+  # -- to:
+  # --   - "johndoe@gmail.com"
+  # --   - "admin@example.com"
   to: "johndoe@gmail.com"
 
 resources:

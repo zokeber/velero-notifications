@@ -39,4 +39,11 @@ data:
         username: {{ .Values.email.username | quote }}
         password: {{ .Values.email.password | quote }}
         from: {{ .Values.email.from | quote }}
+        {{ if kindIs "slice" .Values.email.to -}}
+        to:
+{{- range .Values.email.to }}
+          - {{ . | quote }}
+{{- end }}
+        {{- else }}
         to: {{ .Values.email.to | quote }}
+        {{- end }}

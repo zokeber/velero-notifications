@@ -26,6 +26,9 @@ func NewEmailNotifier(cfg EmailConfig) (*EmailNotifier, error) {
 	if cfg.SMTPServer == "" {
 		return nil, fmt.Errorf("error trying to configure email")
 	}
+	if len(cfg.To) == 0 {
+		return nil, fmt.Errorf("email notifier requires at least one recipient")
+	}
 	return &EmailNotifier{config: cfg}, nil
 }
 
@@ -46,7 +49,7 @@ func (e *EmailNotifier) Notify(status, message string) error {
 		auth = smtp.PlainAuth("", e.config.Username, e.config.Password, e.config.SMTPServer)
 	}
 
-	msg := []byte("To: " + strings.Join(e.config.To, ",") + "\r\n" +
+	msg := []byte("To: " + strings.Join(e.config.To, ", ") + "\r\n" +
 		"Subject: " + e.config.Prefix + " Backup " + status + "\r\n" +
 		"\r\n" +
 		message +
